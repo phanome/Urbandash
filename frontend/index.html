@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UrbanDash — Driver Payout Dashboard</title>
+  <meta name="description" content="UrbanDash delivery executive payout calculation system. View per-driver earnings breakdown including incentives, bonuses, and shift pay." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Background orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🛵</span>
+        <div>
+          <span class="logo-title">UrbanDash</span>
+          <span class="logo-sub">Payout Dashboard</span>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="badge badge-live">● LIVE</span>
+        <span class="header-date" id="headerDate"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== RULES BANNER ===== -->
+  <section class="rules-section">
+    <div class="rules-inner">
+      <h2 class="rules-title">Incentive Rules</h2>
+      <div class="rules-grid">
+        <div class="rule-pill">
+          <span class="rule-icon">📦</span>
+          <span>Base <strong>₹35</strong>/delivery</span>
+        </div>
+        <div class="rule-pill">
+          <span class="rule-icon">🌧️</span>
+          <span>Rain <strong>+₹15</strong> (14:00–16:00)</span>
+        </div>
+        <div class="rule-pill">
+          <span class="rule-icon">⚡</span>
+          <span>Peak <strong>+₹20</strong> (12–14 &amp; 19–21)</span>
+        </div>
+        <div class="rule-pill">
+          <span class="rule-icon">🔥</span>
+          <span>Streak 5× <strong>+₹150</strong></span>
+        </div>
+        <div class="rule-pill">
+          <span class="rule-icon">📍</span>
+          <span>Distance &gt;8km <strong>+₹25</strong></span>
+        </div>
+        <div class="rule-pill">
+          <span class="rule-icon">❌</span>
+          <span>Rejection <strong>−₹50</strong></span>
+        </div>
+        <div class="rule-pill">
+          <span class="rule-icon">⏱️</span>
+          <span>Shift <strong>₹100</strong>/hr (min 4 hrs)</span>
+        </div>
+        <div class="rule-pill">
+          <span class="rule-icon">💸</span>
+          <span>Tips <strong>100%</strong> to driver</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
+
+    <!-- Summary stats bar -->
+    <div class="stats-bar" id="statsBar" style="display:none;">
+      <div class="stat-item">
+        <span class="stat-label">Total Drivers</span>
+        <span class="stat-value" id="statDrivers">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Total Deliveries</span>
+        <span class="stat-value" id="statDeliveries">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Total Payouts</span>
+        <span class="stat-value highlight" id="statTotal">—</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Avg Per Driver</span>
+        <span class="stat-value" id="statAvg">—</span>
+      </div>
+    </div>
+
+    <!-- Section heading -->
+    <div class="section-heading">
+      <h1>Driver Earnings Breakdown</h1>
+      <p>Click any driver card to view detailed payout</p>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <p>Loading drivers…</p>
+    </div>
+
+    <!-- Driver cards grid -->
+    <div class="driver-grid" id="driverGrid"></div>
+
+  </main>
+
+  <!-- ===== DETAIL DRAWER ===== -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title-area">
+        <div class="drawer-avatar" id="drawerAvatar"></div>
+        <div>
+          <h2 class="drawer-name" id="drawerName"></h2>
+          <span class="drawer-id" id="drawerId"></span>
+        </div>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="Close">✕</button>
+    </div>
+
+    <div class="drawer-body" id="drawerBody">
+      <!-- Injected by JS -->
+    </div>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
