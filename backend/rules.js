@@ -1,17 +1,3 @@
-/**
- * UrbanDash Payout Rules Engine
- *
- * Rules:
- *  - Base:          ₹35/completed delivery
- *  - Rain bonus:    +₹15/delivery (14:00–16:00, declared rain hours)
- *  - Peak bonus:    +₹20/delivery (12:00–14:00 and 19:00–21:00)
- *  - Streak bonus:  ₹150 per 5 consecutive completions without rejection (resets after)
- *  - Long-distance: >8 km → +₹25
- *  - Rejection:     −₹50/rejected order (max 2/day triggers deactivation warning)
- *  - Shift pay:     ₹100/hour (minimum 4 hours logged across all shifts)
- *  - Tips:          100% passed to driver
- */
-
 const BASE_FEE        = 35;
 const RAIN_BONUS      = 15;
 const PEAK_BONUS      = 20;
@@ -20,39 +6,24 @@ const STREAK_TARGET   = 5;
 const LONG_DIST_BONUS = 25;
 const LONG_DIST_KM    = 8;
 const REJECTION_PEN   = 50;
-const SHIFT_RATE      = 100; // per hour
+const SHIFT_RATE      = 100;
 const MIN_SHIFT_HOURS = 4;
 const MAX_REJECTIONS  = 2;
-
-/** Parse "HH:MM" → minutes since midnight */
 function toMinutes(timeStr) {
   const [h, m] = timeStr.split(':').map(Number);
   return h * 60 + m;
 }
-
-/** Total logged hours across all shifts */
 function totalShiftHours(shifts) {
   return shifts.reduce((sum, s) => {
     const mins = toMinutes(s.logout) - toMinutes(s.login);
     return sum + mins / 60;
   }, 0);
 }
-
-/**
- * Compute full payout breakdown for a driver document.
- * Returns a rich breakdown object used by the API.
- */
 function computePayout(driver) {
   const { deliveries, shifts } = driver;
-
-  // --- Shift pay ---
   const shiftHours = totalShiftHours(shifts);
   const qualifiesShiftPay = shiftHours >= MIN_SHIFT_HOURS;
-  const shiftPay = qualifiesShiftPay ? Math.floor(shiftHours) * SHIFT_RATE : 0;
-  // Note: spec says ₹100/hour — we use exact decimal hours
   const shiftPayExact = qualifiesShiftPay ? shiftHours * SHIFT_RATE : 0;
-
-  // --- Per-delivery breakdown ---
   let streakCount   = 0;
   let streakBonuses = 0;
   let totalBase     = 0;
@@ -62,7 +33,6 @@ function computePayout(driver) {
   let totalPenalty  = 0;
   let totalTips     = 0;
   let rejectionCount = 0;
-
   const deliveryBreakdown = deliveries.map((d) => {
     const isRejected = d.conditions.includes('REJECTED');
     const row = {
@@ -82,39 +52,27 @@ function computePayout(driver) {
       penalty:    0,
       rowTotal:   0,
     };
-
     if (isRejected) {
       rejectionCount++;
       row.penalty = -REJECTION_PEN;
       totalPenalty += -REJECTION_PEN;
-      streakCount = 0; // streak resets on rejection
+      streakCount = 0;
     } else {
-      // Base
       row.base = BASE_FEE;
       totalBase += BASE_FEE;
-
-      // Rain bonus: condition includes RAIN (14:00–16:00 declared)
       if (d.conditions.includes('RAIN')) {
         row.rainBonus = RAIN_BONUS;
         totalRain += RAIN_BONUS;
       }
-
-      // Peak bonus
       if (d.conditions.includes('PEAK')) {
         row.peakBonus = PEAK_BONUS;
         totalPeak += PEAK_BONUS;
       }
-
-      // Long-distance bonus (>8 km)
       if (d.distanceKm > LONG_DIST_KM || d.conditions.includes('long-distance')) {
         row.distBonus = LONG_DIST_BONUS;
         totalDistance += LONG_DIST_BONUS;
       }
-
-      // Tips
       totalTips += row.tip;
-
-      // Streak
       streakCount++;
       if (streakCount === STREAK_TARGET) {
         row.streakBonus = STREAK_BONUS;
@@ -122,7 +80,6 @@ function computePayout(driver) {
         streakCount = 0;
       }
     }
-
     row.rowTotal =
       row.base +
       row.rainBonus +
@@ -131,10 +88,8 @@ function computePayout(driver) {
       row.streakBonus +
       row.penalty +
       row.tip;
-
     return row;
   });
-
   const grandTotal =
     shiftPayExact +
     totalBase +
@@ -144,7 +99,6 @@ function computePayout(driver) {
     streakBonuses +
     totalPenalty +
     totalTips;
-
   return {
     driverId:    driver.driverId,
     name:        driver.name,
@@ -168,5 +122,4 @@ function computePayout(driver) {
     grandTotal,
   };
 }
-
 module.exports = { computePayout };

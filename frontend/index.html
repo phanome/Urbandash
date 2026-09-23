@@ -7,133 +7,215 @@
   <meta name="description" content="UrbanDash delivery executive payout calculation system. View per-driver earnings breakdown including incentives, bonuses, and shift pay." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- Background orbs -->
-  <div class="bg-orb orb-1"></div>
-  <div class="bg-orb orb-2"></div>
-  <div class="bg-orb orb-3"></div>
-
-  <!-- ===== HEADER ===== -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">🛵</span>
-        <div>
-          <span class="logo-title">UrbanDash</span>
-          <span class="logo-sub">Payout Dashboard</span>
-        </div>
-      </div>
-      <div class="header-meta">
-        <span class="badge badge-live">● LIVE</span>
-        <span class="header-date" id="headerDate"></span>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">UD</div>
+      <div>
+        <div class="logo-text">UrbanDash</div>
+        <div class="logo-subtext">Operations</div>
       </div>
     </div>
-  </header>
-
-  <!-- ===== RULES BANNER ===== -->
-  <section class="rules-section">
-    <div class="rules-inner">
-      <h2 class="rules-title">Incentive Rules</h2>
-      <div class="rules-grid">
-        <div class="rule-pill">
-          <span class="rule-icon">📦</span>
-          <span>Base <strong>₹35</strong>/delivery</span>
-        </div>
-        <div class="rule-pill">
-          <span class="rule-icon">🌧️</span>
-          <span>Rain <strong>+₹15</strong> (14:00–16:00)</span>
-        </div>
-        <div class="rule-pill">
-          <span class="rule-icon">⚡</span>
-          <span>Peak <strong>+₹20</strong> (12–14 &amp; 19–21)</span>
-        </div>
-        <div class="rule-pill">
-          <span class="rule-icon">🔥</span>
-          <span>Streak 5× <strong>+₹150</strong></span>
-        </div>
-        <div class="rule-pill">
-          <span class="rule-icon">📍</span>
-          <span>Distance &gt;8km <strong>+₹25</strong></span>
-        </div>
-        <div class="rule-pill">
-          <span class="rule-icon">❌</span>
-          <span>Rejection <strong>−₹50</strong></span>
-        </div>
-        <div class="rule-pill">
-          <span class="rule-icon">⏱️</span>
-          <span>Shift <strong>₹100</strong>/hr (min 4 hrs)</span>
-        </div>
-        <div class="rule-pill">
-          <span class="rule-icon">💸</span>
-          <span>Tips <strong>100%</strong> to driver</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== MAIN CONTENT ===== -->
-  <main class="main-content">
-
-    <!-- Summary stats bar -->
-    <div class="stats-bar" id="statsBar" style="display:none;">
-      <div class="stat-item">
-        <span class="stat-label">Total Drivers</span>
-        <span class="stat-value" id="statDrivers">—</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Total Deliveries</span>
-        <span class="stat-value" id="statDeliveries">—</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Total Payouts</span>
-        <span class="stat-value highlight" id="statTotal">—</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Avg Per Driver</span>
-        <span class="stat-value" id="statAvg">—</span>
-      </div>
-    </div>
-
-    <!-- Section heading -->
-    <div class="section-heading">
-      <h1>Driver Earnings Breakdown</h1>
-      <p>Click any driver card to view detailed payout</p>
-    </div>
-
-    <!-- Loading state -->
-    <div class="loader" id="loader">
-      <div class="spinner"></div>
-      <p>Loading drivers…</p>
-    </div>
-
-    <!-- Driver cards grid -->
-    <div class="driver-grid" id="driverGrid"></div>
-
-  </main>
-
-  <!-- ===== DETAIL DRAWER ===== -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
-    <div class="drawer-header">
-      <div class="drawer-title-area">
-        <div class="drawer-avatar" id="drawerAvatar"></div>
-        <div>
-          <h2 class="drawer-name" id="drawerName"></h2>
-          <span class="drawer-id" id="drawerId"></span>
-        </div>
-      </div>
-      <button class="drawer-close" id="drawerClose" aria-label="Close">✕</button>
-    </div>
-
-    <div class="drawer-body" id="drawerBody">
-      <!-- Injected by JS -->
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Payroll</div>
+      <button class="nav-item active" id="navPayouts">
+        Driver Payouts
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="status-dot"></span>API connected · port 3001
     </div>
   </aside>
-
-  <script src="app.js"></script>
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1>Driver Payouts</h1>
+        <p>Shift date: today's calculated run</p>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-date" id="headerDate"></span>
+        <button class="btn" onclick="location.reload()">Refresh</button>
+        <button class="btn btn-primary" id="openAddDriver">Add Driver</button>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="stats-row" id="statsRow" style="display:none;">
+        <div class="stat-card">
+          <div class="stat-label">Total Drivers</div>
+          <div class="stat-value" id="statDrivers">—</div>
+          <div class="stat-delta">On shift today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Deliveries</div>
+          <div class="stat-value" id="statDeliveries">—</div>
+          <div class="stat-delta" id="statRejected">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Payout</div>
+          <div class="stat-value" id="statTotal">—</div>
+          <div class="stat-delta">Across all drivers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg per Driver</div>
+          <div class="stat-value" id="statAvg">—</div>
+          <div class="stat-delta">Per completed shift</div>
+        </div>
+      </div>
+      <div class="rules-bar">
+        <div class="rules-bar-header">
+          <span class="rules-bar-title">Active Incentive Rules</span>
+        </div>
+        <div class="rules-list">
+          <span class="rule-tag">Base Rs.35/delivery</span>
+          <span class="rule-tag">Rain +Rs.15 (14:00–16:00)</span>
+          <span class="rule-tag">Peak +Rs.20 (12–14 &amp; 19–21)</span>
+          <span class="rule-tag">Streak x5 → +Rs.150</span>
+          <span class="rule-tag">&gt;8 km → +Rs.25</span>
+          <span class="rule-tag">Rejection −Rs.50</span>
+          <span class="rule-tag">Shift Rs.100/hr (min 4 hrs)</span>
+          <span class="rule-tag">Tips 100% passed through</span>
+        </div>
+      </div>
+      <div class="section-header">
+        <div>
+          <span class="section-title">Drivers</span>
+          <span class="section-count" id="driverCount"></span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="driver-table" id="driverTable">
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>Shift</th>
+              <th>Hours</th>
+              <th>Deliveries</th>
+              <th>Status</th>
+              <th style="text-align:right;">Total Payout</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="driverTbody">
+            <tr class="loader-row">
+              <td colspan="8">
+                <span class="spinner"></span>Loading drivers...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
+  <div class="drawer-header">
+    <div class="drawer-title-area">
+      <div class="drawer-avatar" id="drawerAvatar"></div>
+      <div>
+        <div class="drawer-name" id="drawerName">—</div>
+        <div class="drawer-sub" id="drawerId">—</div>
+      </div>
+    </div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close">x</button>
+  </div>
+  <div class="drawer-tabs">
+    <button class="drawer-tab active" data-tab="breakdown" id="tabBreakdown">Breakdown</button>
+    <button class="drawer-tab" data-tab="summary" id="tabSummary">Summary</button>
+  </div>
+  <div class="drawer-body" id="drawerBody">
+    <div class="drawer-loading">
+      <span class="spinner"></span> Loading payout...
+    </div>
+  </div>
+</aside>
+<div class="modal-overlay" id="addDriverOverlay" aria-hidden="true">
+  <div class="modal" id="addDriverModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">Add New Driver</div>
+        <div class="modal-subtitle" id="modalSubtitle">Enter driver shift and delivery details</div>
+      </div>
+      <button class="modal-close" id="closeAddDriver" aria-label="Close modal">x</button>
+    </div>
+    <div class="modal-steps">
+      <div class="modal-step active" id="step-pip-1">
+        <div class="step-num">1</div>
+        <div class="step-label">Driver Info</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="modal-step" id="step-pip-2">
+        <div class="step-num">2</div>
+        <div class="step-label">Deliveries</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="modal-step" id="step-pip-3">
+        <div class="step-num">3</div>
+        <div class="step-label">Preview</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-step-content" id="modalStep1">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="driverName">Driver Name <span class="req">*</span></label>
+            <input class="form-input" type="text" id="driverName" placeholder="e.g. Ravi Kumar" autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="driverIdInput">Driver ID <span class="form-hint">(auto-generated if empty)</span></label>
+            <input class="form-input" type="text" id="driverIdInput" placeholder="e.g. D-106" autocomplete="off" />
+          </div>
+        </div>
+        <div class="form-section-title">Shift Time</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="shiftLogin">Login Time <span class="req">*</span></label>
+            <input class="form-input" type="time" id="shiftLogin" value="09:00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="shiftLogout">Logout Time <span class="req">*</span></label>
+            <input class="form-input" type="time" id="shiftLogout" value="15:00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="shiftLabel">Shift Label</label>
+            <input class="form-input" type="text" id="shiftLabel" placeholder="e.g. Morning Shift" />
+          </div>
+        </div>
+        <div class="modal-note">
+          Shift pay is Rs.100/hr — drivers must log at least 4 hours to qualify.
+        </div>
+      </div>
+      <div class="modal-step-content hidden" id="modalStep2">
+        <div class="deliveries-header">
+          <span class="form-section-title" style="margin:0;">Deliveries</span>
+          <button class="btn btn-sm" id="addDeliveryRow">Add Delivery</button>
+        </div>
+        <div class="delivery-rows" id="deliveryRows"></div>
+        <div class="modal-note">
+          Select <strong>REJECTED</strong> to mark a delivery as rejected (−Rs.50 penalty, streak resets). Tip is optional.
+        </div>
+      </div>
+      <div class="modal-step-content hidden" id="modalStep3">
+        <div id="previewContent">
+          <div class="drawer-loading"><span class="spinner"></span> Calculating payout...</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="modalBack" style="display:none;">Back</button>
+      <div class="modal-footer-right">
+        <span class="modal-error" id="modalError"></span>
+        <button class="btn" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalNext">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
 </body>
 </html>

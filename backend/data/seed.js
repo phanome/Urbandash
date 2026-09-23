@@ -1,8 +1,3 @@
-/**
- * Seed data for all 5 drivers from the UrbanDash spec.
- * Conditions array can contain: "PEAK", "RAIN", "long-distance", "REJECTED"
- */
-
 const seedDrivers = [
   {
     driverId: 'D-101',
@@ -21,7 +16,6 @@ const seedDrivers = [
       { number: 10, time: '15:00', distanceKm: 4.0, tip: 25,  conditions: ['RAIN'] },
     ],
   },
-
   {
     driverId: 'D-102',
     name: 'Sunil',
@@ -44,7 +38,6 @@ const seedDrivers = [
       { number: 15, time: '21:15', distanceKm: 2.0, tip: 0,   conditions: ['PEAK'] },
     ],
   },
-
   {
     driverId: 'D-103',
     name: 'Meera',
@@ -53,13 +46,11 @@ const seedDrivers = [
       { login: '17:00', logout: '21:00', label: 'Evening' },
     ],
     deliveries: [
-      // Morning
       { number: 1,  time: '08:30', distanceKm: 3.0, tip: 0,   conditions: ['normal'] },
       { number: 2,  time: '09:15', distanceKm: 4.0, tip: 15,  conditions: ['normal'] },
       { number: 3,  time: '09:50', distanceKm: 5.5, tip: 0,   conditions: ['normal'] },
       { number: 4,  time: '10:30', distanceKm: 3.2, tip: 0,   conditions: ['normal'] },
       { number: 5,  time: '11:15', distanceKm: 6.0, tip: 20,  conditions: ['normal'] },
-      // Evening
       { number: 6,  time: '17:30', distanceKm: 4.0, tip: 0,   conditions: ['normal'] },
       { number: 7,  time: '18:15', distanceKm: 3.5, tip: 25,  conditions: ['normal'] },
       { number: 8,  time: '19:00', distanceKm: 7.5, tip: 0,   conditions: ['PEAK'] },
@@ -67,7 +58,6 @@ const seedDrivers = [
       { number: 10, time: '20:30', distanceKm: 9.0, tip: 0,   conditions: ['PEAK', 'long-distance'] },
     ],
   },
-
   {
     driverId: 'D-104',
     name: 'Arjun',
@@ -79,7 +69,6 @@ const seedDrivers = [
       { number: 4, time: '13:55', distanceKm: null, tip: 0,  conditions: ['REJECTED'] },
     ],
   },
-
   {
     driverId: 'D-105',
     name: 'Kabir',
@@ -93,5 +82,4 @@ const seedDrivers = [
     ],
   },
 ];
-
 module.exports = seedDrivers;
