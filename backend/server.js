@@ -20,7 +20,7 @@ async function seedIfEmpty() {
     console.log(`MongoDB already has ${count} drivers`);
   }
 }
-const mongoURI = process.env.MONGO_URI || process.env.MONGODB_URI;
+const mongoURI = process.env.MONGO_URI || process.env.MONGODB_URI || process.env.MONGO_URL;
 
 if (!mongoURI) {
   console.error('FATAL ERROR: MONGO_URI is missing from environment variables.');
