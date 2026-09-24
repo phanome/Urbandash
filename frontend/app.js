@@ -35,6 +35,8 @@ document.getElementById('headerDate').textContent =
   });
 let allDrivers = [];
 let paletteMap = {};
+let allDriverDetails = [];
+
 async function loadDrivers() {
   try {
     const res = await fetch(`${API}/drivers`);
@@ -44,6 +46,13 @@ async function loadDrivers() {
     });
     renderStats(allDrivers);
     renderTable(allDrivers);
+
+    // Fetch detailed payout data for Shift Logs & Deliveries views
+    allDriverDetails = await Promise.all(
+      allDrivers.map(d => fetch(`${API}/payout/${d.driverId}`).then(r => r.json()))
+    );
+    renderShiftLogs(allDriverDetails);
+    renderDeliveries(allDriverDetails);
   } catch (err) {
     document.getElementById('driverTbody').innerHTML = `
       <tr class="loader-row">
@@ -53,6 +62,140 @@ async function loadDrivers() {
       </tr>`;
   }
 }
+
+function renderShiftLogs(details) {
+  const tbody = document.getElementById('shiftLogsTbody');
+  tbody.innerHTML = '';
+  let count = 0;
+
+  details.forEach((d) => {
+    d.shifts.forEach((s) => {
+      count++;
+      const durationStr = shiftDuration(s.login, s.logout);
+      const shiftHrs = (toMinutes(s.logout) - toMinutes(s.login)) / 60;
+      const shiftPayVal = d.qualifiesShiftPay ? Math.round(shiftHrs * 100) : 0;
+      const badge = d.qualifiesShiftPay
+        ? `<span class="badge badge-green">Qualifies (≥4h)</span>`
+        : `<span class="badge badge-amber">No shift pay (<4h)</span>`;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <div class="driver-cell">
+            <div>
+              <div class="driver-name">${d.name}</div>
+              <div class="driver-id-small">${d.driverId}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="text-muted">${s.label || 'Shift'}</span></td>
+        <td class="mono">${s.login}</td>
+        <td class="mono">${s.logout}</td>
+        <td class="mono">${durationStr}</td>
+        <td style="text-align:right;"><span class="mono" style="font-weight:600;">₹${shiftPayVal}</span></td>
+        <td>${badge}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+  document.getElementById('shiftLogsCount').textContent = `${count} shift log${count !== 1 ? 's' : ''}`;
+}
+
+function renderDeliveries(details) {
+  const tbody = document.getElementById('deliveriesTbody');
+  tbody.innerHTML = '';
+  let count = 0;
+
+  details.forEach((driver) => {
+    driver.deliveryBreakdown.forEach((d) => {
+      count++;
+      let tags = '';
+      if (d.isRejected) {
+        tags = `<span class="ct ct-reject">Rejected</span>`;
+      } else {
+        const condList = d.conditions.filter(c => c !== 'normal');
+        if (condList.length === 0) {
+          tags = `<span class="ct-normal">—</span>`;
+        } else {
+          tags = condList.map(c => {
+            if (c === 'PEAK')          return `<span class="ct ct-peak">Peak</span>`;
+            if (c === 'RAIN')          return `<span class="ct ct-rain">Rain</span>`;
+            if (c === 'long-distance') return `<span class="ct ct-dist">&gt;8km</span>`;
+            return `<span class="ct">${c}</span>`;
+          }).join('');
+        }
+        if (d.disputed) tags += ` <span class="ct ct-disputed">Disputed</span>`;
+        if (d.streakBonus > 0) tags += ` <span class="ct ct-streak">Streak ×5</span>`;
+      }
+
+      const rowTotal = d.isRejected
+        ? `<span class="val-neg">−₹${Math.abs(d.penalty)}</span>`
+        : `<span class="val-bold">₹${d.rowTotal}</span>`;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <div class="driver-cell">
+            <div>
+              <div class="driver-name">${driver.name}</div>
+              <div class="driver-id-small">${driver.driverId}</div>
+            </div>
+          </div>
+        </td>
+        <td class="cell-num">#${d.number}</td>
+        <td class="cell-time">${d.time}</td>
+        <td class="cell-dist">${d.distanceKm != null ? d.distanceKm + ' km' : '—'}</td>
+        <td><div class="cond-tags">${tags}</div></td>
+        <td>${d.isRejected ? '<span class="val-zero">—</span>' : `<span class="val-pos">+₹${d.base}</span>`}</td>
+        <td>${d.rainBonus  ? `<span class="val-pos">+₹${d.rainBonus}</span>`  : '<span class="val-zero">—</span>'}</td>
+        <td>${d.peakBonus  ? `<span class="val-pos">+₹${d.peakBonus}</span>`  : '<span class="val-zero">—</span>'}</td>
+        <td>${d.distBonus  ? `<span class="val-pos">+₹${d.distBonus}</span>`  : '<span class="val-zero">—</span>'}</td>
+        <td>${d.tip        ? `<span>₹${d.tip}</span>`                         : '<span class="val-zero">—</span>'}</td>
+        <td style="text-align:right;">${rowTotal}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+  document.getElementById('deliveriesCount').textContent = `${count} deliveries`;
+}
+
+// Sidebar Navigation Switcher
+const navPayouts   = document.getElementById('navPayouts');
+const navShiftLogs = document.getElementById('navShiftLogs');
+const navDeliveries= document.getElementById('navDeliveries');
+
+const viewPayouts   = document.getElementById('viewPayouts');
+const viewShiftLogs = document.getElementById('viewShiftLogs');
+const viewDeliveries= document.getElementById('viewDeliveries');
+
+const topbarTitle    = document.getElementById('topbarTitle');
+const topbarSubtitle = document.getElementById('topbarSubtitle');
+
+function switchView(viewName) {
+  [navPayouts, navShiftLogs, navDeliveries].forEach(n => n.classList.remove('active'));
+  [viewPayouts, viewShiftLogs, viewDeliveries].forEach(v => v.style.display = 'none');
+
+  if (viewName === 'payouts') {
+    navPayouts.classList.add('active');
+    viewPayouts.style.display = 'block';
+    topbarTitle.textContent = 'Driver Payouts';
+    topbarSubtitle.textContent = "Shift date: today's calculated run";
+  } else if (viewName === 'shiftLogs') {
+    navShiftLogs.classList.add('active');
+    viewShiftLogs.style.display = 'block';
+    topbarTitle.textContent = 'Shift Logs';
+    topbarSubtitle.textContent = 'Logged driver shift duration & qualification';
+  } else if (viewName === 'deliveries') {
+    navDeliveries.classList.add('active');
+    viewDeliveries.style.display = 'block';
+    topbarTitle.textContent = 'Deliveries Log';
+    topbarSubtitle.textContent = 'All individual delivery line items & bonuses';
+  }
+}
+
+if (navPayouts)    navPayouts.addEventListener('click', () => switchView('payouts'));
+if (navShiftLogs)  navShiftLogs.addEventListener('click', () => switchView('shiftLogs'));
+if (navDeliveries) navDeliveries.addEventListener('click', () => switchView('deliveries'));
 function renderStats(drivers) {
   const totalDel    = drivers.reduce((s, d) => s + d.completedDeliveries + d.rejectedDeliveries, 0);
   const totalRej    = drivers.reduce((s, d) => s + d.rejectedDeliveries, 0);

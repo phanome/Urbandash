@@ -25,6 +25,12 @@
       <button class="nav-item active" id="navPayouts">
         Driver Payouts
       </button>
+      <button class="nav-item" id="navShiftLogs">
+        Shift Logs
+      </button>
+      <button class="nav-item" id="navDeliveries">
+        Deliveries
+      </button>
     </nav>
     <div class="sidebar-footer">
       <span class="status-dot"></span>API connected · port 3001
@@ -33,8 +39,8 @@
   <div class="main-area">
     <header class="topbar">
       <div class="topbar-left">
-        <h1>Driver Payouts</h1>
-        <p>Shift date: today's calculated run</p>
+        <h1 id="topbarTitle">Driver Payouts</h1>
+        <p id="topbarSubtitle">Shift date: today's calculated run</p>
       </div>
       <div class="topbar-right">
         <span class="topbar-date" id="headerDate"></span>
@@ -43,71 +49,146 @@
       </div>
     </header>
     <main class="page-content">
-      <div class="stats-row" id="statsRow" style="display:none;">
-        <div class="stat-card">
-          <div class="stat-label">Total Drivers</div>
-          <div class="stat-value" id="statDrivers">—</div>
-          <div class="stat-delta">On shift today</div>
+
+      <!-- Driver Payouts View -->
+      <div id="viewPayouts" class="dashboard-view">
+        <div class="stats-row" id="statsRow" style="display:none;">
+          <div class="stat-card">
+            <div class="stat-label">Total Drivers</div>
+            <div class="stat-value" id="statDrivers">—</div>
+            <div class="stat-delta">On shift today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Deliveries</div>
+            <div class="stat-value" id="statDeliveries">—</div>
+            <div class="stat-delta" id="statRejected">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Payout</div>
+            <div class="stat-value" id="statTotal">—</div>
+            <div class="stat-delta">Across all drivers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Avg per Driver</div>
+            <div class="stat-value" id="statAvg">—</div>
+            <div class="stat-delta">Per completed shift</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Total Deliveries</div>
-          <div class="stat-value" id="statDeliveries">—</div>
-          <div class="stat-delta" id="statRejected">—</div>
+
+        <div class="rules-bar">
+          <div class="rules-bar-header">
+            <span class="rules-bar-title">Active Incentive Rules</span>
+          </div>
+          <div class="rules-list">
+            <span class="rule-tag">Base Rs.35/delivery</span>
+            <span class="rule-tag">Rain +Rs.15 (14:00–16:00)</span>
+            <span class="rule-tag">Peak +Rs.20 (12–14 &amp; 19–21)</span>
+            <span class="rule-tag">Streak x5 → +Rs.150</span>
+            <span class="rule-tag">&gt;8 km → +Rs.25</span>
+            <span class="rule-tag">Rejection −Rs.50</span>
+            <span class="rule-tag">Shift Rs.100/hr (min 4 hrs)</span>
+            <span class="rule-tag">Tips 100% passed through</span>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Total Payout</div>
-          <div class="stat-value" id="statTotal">—</div>
-          <div class="stat-delta">Across all drivers</div>
+
+        <div class="section-header">
+          <div>
+            <span class="section-title">Drivers</span>
+            <span class="section-count" id="driverCount"></span>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Avg per Driver</div>
-          <div class="stat-value" id="statAvg">—</div>
-          <div class="stat-delta">Per completed shift</div>
+
+        <div class="table-wrap">
+          <table class="driver-table" id="driverTable">
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>Shift</th>
+                <th>Hours</th>
+                <th>Deliveries</th>
+                <th>Status</th>
+                <th style="text-align:right;">Total Payout</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="driverTbody">
+              <tr class="loader-row">
+                <td colspan="8">
+                  <span class="spinner"></span>Loading drivers...
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="rules-bar">
-        <div class="rules-bar-header">
-          <span class="rules-bar-title">Active Incentive Rules</span>
+
+      <!-- Shift Logs View -->
+      <div id="viewShiftLogs" class="dashboard-view" style="display:none;">
+        <div class="section-header">
+          <div>
+            <span class="section-title">Shift Logs</span>
+            <span class="section-count" id="shiftLogsCount"></span>
+          </div>
         </div>
-        <div class="rules-list">
-          <span class="rule-tag">Base Rs.35/delivery</span>
-          <span class="rule-tag">Rain +Rs.15 (14:00–16:00)</span>
-          <span class="rule-tag">Peak +Rs.20 (12–14 &amp; 19–21)</span>
-          <span class="rule-tag">Streak x5 → +Rs.150</span>
-          <span class="rule-tag">&gt;8 km → +Rs.25</span>
-          <span class="rule-tag">Rejection −Rs.50</span>
-          <span class="rule-tag">Shift Rs.100/hr (min 4 hrs)</span>
-          <span class="rule-tag">Tips 100% passed through</span>
+        <div class="table-wrap">
+          <table class="driver-table">
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>Shift Label</th>
+                <th>Login Time</th>
+                <th>Logout Time</th>
+                <th>Logged Hours</th>
+                <th style="text-align:right;">Shift Pay</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="shiftLogsTbody">
+              <tr class="loader-row">
+                <td colspan="7">
+                  <span class="spinner"></span>Loading shift logs...
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="section-header">
-        <div>
-          <span class="section-title">Drivers</span>
-          <span class="section-count" id="driverCount"></span>
+
+      <!-- Deliveries View -->
+      <div id="viewDeliveries" class="dashboard-view" style="display:none;">
+        <div class="section-header">
+          <div>
+            <span class="section-title">Deliveries Log</span>
+            <span class="section-count" id="deliveriesCount"></span>
+          </div>
         </div>
-      </div>
-      <div class="table-wrap">
-        <table class="driver-table" id="driverTable">
-          <thead>
-            <tr>
-              <th>Driver</th>
-              <th>Shift</th>
-              <th>Hours</th>
-              <th>Deliveries</th>
-              <th>Status</th>
-              <th style="text-align:right;">Total Payout</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="driverTbody">
-            <tr class="loader-row">
-              <td colspan="8">
-                <span class="spinner"></span>Loading drivers...
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-wrap">
+          <table class="driver-table">
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>#</th>
+                <th>Time</th>
+                <th>Distance</th>
+                <th>Conditions</th>
+                <th>Base</th>
+                <th>Rain</th>
+                <th>Peak</th>
+                <th>Dist+</th>
+                <th>Tip</th>
+                <th style="text-align:right;">Row Total</th>
+              </tr>
+            </thead>
+            <tbody id="deliveriesTbody">
+              <tr class="loader-row">
+                <td colspan="11">
+                  <span class="spinner"></span>Loading deliveries...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
   </div>
