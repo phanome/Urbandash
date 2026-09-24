@@ -26,21 +26,6 @@ UrbanDash is a full-stack operations dashboard and payout calculation engine bui
 
 ---
 
-## 📊 Business & Incentive Rules
-
-| Rule Component | Rate / Condition | Details |
-|---|---|---|
-| **Base Pay** | **₹35** / delivery | Standard fee for completed deliveries |
-| **Shift Pay** | **₹100** / hour | Requires minimum 4 hours logged (0 pay if < 4h) |
-| **Rain Bonus** | **+₹15** / delivery | Active during rain windows (14:00–16:00) |
-| **Peak Bonus** | **+₹20** / delivery | Active during peak hours (12:00–14:00 & 19:00–21:00) |
-| **Long Distance** | **+₹25** / delivery | Applies to deliveries with distance > 8 km |
-| **Streak Bonus** | **+₹150** / 5 streak | Awarded for every 5 consecutive completed deliveries |
-| **Rejection Penalty** | **−₹50** / rejection | Resets streak counter to 0; flags warning if ≥ 2 rejections |
-| **Customer Tips** | **100% Pass-through** | Added directly to driver payout without fees |
-
----
-
 ## 🛠 Tech Stack
 
 - **Frontend:** HTML5, CSS3 (Vanilla CSS with custom variables), Modern JavaScript (ES6+ async/await)
