@@ -48,7 +48,7 @@ async function loadDrivers() {
     document.getElementById('driverTbody').innerHTML = `
       <tr class="loader-row">
         <td colspan="7" style="color:#dc2626;">
-           Could not connect to API on port 3001. Make sure the backend is running.
+          Could not connect to API at ${API}. Make sure the backend is running.
         </td>
       </tr>`;
   }
