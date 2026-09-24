@@ -20,8 +20,15 @@ async function seedIfEmpty() {
     console.log(`MongoDB already has ${count} drivers`);
   }
 }
+const mongoURI = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+if (!mongoURI) {
+  console.error('FATAL ERROR: MONGO_URI is missing from environment variables.');
+  process.exit(1);
+}
+
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(mongoURI)
   .then(async () => {
     console.log('Connected to MongoDB');
     await seedIfEmpty();
