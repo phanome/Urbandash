@@ -1,4 +1,4 @@
-const API = 'http://localhost:3001/api';
+const API = 'https://urbandash.onrender.com/api';
 const AVATAR_COLORS = [
   { bg: '#eff6ff', color: '#2563eb', border: '#bfdbfe' },
   { bg: '#f0fdf4', color: '#16a34a', border: '#bbf7d0' },
